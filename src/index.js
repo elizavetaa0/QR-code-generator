@@ -1,4 +1,6 @@
 import './pages/index.css';
+import { checkValidation} from './scripts/validation';
+import { updateContent } from './scripts/update';
 
 const contentWrapper = document.querySelector('.content-container');
 const generateBtn = contentWrapper.querySelector('.content-button');
@@ -9,22 +11,6 @@ const langBtn = contentWrapper.querySelector('.language-button');
 const errorMessage = contentWrapper.querySelector('.error-message');
 let currentLanguage = 'en';
 
-const translations = {
-  en: {
-    header: "QR-code generator",
-    text: "Put down a URL or enter text to create QR-code",
-    input: "Enter text or URL",
-    generateBtn: "Generate QR-code",
-    langBtn: "Ru"
-  },
-  ru: {
-    header: "QR-код генератор",
-    text: "Введите URL или текст для генерации QR-кода",
-    input: "Введите текст или URL",
-    generateBtn: "Сгенерировать QR-код",
-    langBtn: "En"
-  },
-};
 
 generateBtn.addEventListener('click', async (evt) => {
   evt.preventDefault();
@@ -72,26 +58,11 @@ formInput.addEventListener('input', (evt) => {
   if (!formInput.value) {
     contentWrapper.classList.remove('active');
   }
-  checkValidation();
+  checkValidation(formInput, currentLanguage, generateBtn, errorMessage);
 });
 
 function setButtonText(button, text) {
   button.textContent = text;
-}
-
-function updateContent() {
-  const elementTranslate = document.querySelectorAll('[data-lang]');
-
-  elementTranslate.forEach(element => {
-    const langKey = element.getAttribute('data-lang');
-    const translatedText = translations[currentLanguage][langKey];
-
-    if (translatedText) {
-      element.textContent = translatedText;
-      element.placeholder = translatedText;
-    }
-  });
-
 }
 
 langBtn.addEventListener('click', (evt) => {
@@ -99,55 +70,16 @@ langBtn.addEventListener('click', (evt) => {
   errorMessage.textContent = '';
   formInput.classList.remove('input-error');
   currentLanguage = currentLanguage === 'en' ? 'ru' : 'en';
-  updateContent();
+  updateContent(currentLanguage);
 });
 
-updateContent();
-
-function checkValidation() {
-  const isValid = formInput.validity.valid;
-  
-  if (isValid) {
-    errorMessage.textContent = '';
-    toggleButtonState(generateBtn, formInput);
-
-  } else {
-    if (currentLanguage === 'en') {
-      errorMessage.textContent = 'Please fill in this field.';
-      toggleButtonState(generateBtn, formInput);
-    }
-    else if (currentLanguage === 'ru') {
-      errorMessage.textContent = 'Заполните это поле.';
-      toggleButtonState(generateBtn, formInput);
-    }
-
-  }
-
-}
+updateContent(currentLanguage);
 
 formInput.addEventListener('input', (evt) => {
   evt.preventDefault();
-  checkValidation();
+  checkValidation(formInput, currentLanguage, generateBtn, errorMessage);
 })
 
-function disableButton (button) {
-  button.setAttribute('disabled', true);
-  button.classList.add('button-disabled');
-}
-
-function toggleButtonState (button, input) {
-  const isValid = formInput.validity.valid;
-  if (!isValid) {
-    disableButton(button);
-    input.classList.add('input-error');
-  }
-  else {
-    button.removeAttribute('disabled', true);
-    button.classList.remove('button-disabled');
-    input.classList.remove('input-error');
-  }
-
-}
 
 
 
